@@ -22,7 +22,7 @@ fun MainScreen(m: FallMonitor, onCalibrate: () -> Unit, onSettings: () -> Unit, 
     if (m.sensorMissing) Text("이 기기에는 가속도 센서가 없습니다.")
     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
         Text("감시", Modifier.weight(1f))
-        Switch(m.running, { if (it) m.start() else m.stop() }, enabled = !m.sensorMissing)
+        MonitorSwitch(m)
     }
     val l = m.last
     Text(if (l == null) "아직 낙하 기록이 없습니다." else
@@ -38,7 +38,7 @@ fun CalibrationScreen(m: FallMonitor, onBack: () -> Unit) = Column(Modifier.padd
     Text("반드시 침대·쿠션 위에서 테스트하세요. 폰을 일부러 던지지 마세요.", color = MaterialTheme.colorScheme.error)
     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
         Text("감시", Modifier.weight(1f))
-        Switch(m.running, { if (it) m.start() else m.stop() }, enabled = !m.sensorMissing)
+        MonitorSwitch(m)
     }
     Text("가속도 크기: %.1f m/s²".format(m.magnitude))
     val color = MaterialTheme.colorScheme.primary
@@ -113,4 +113,10 @@ fun HistoryScreen(h: HistoryStore, onBack: () -> Unit) = Column(Modifier.padding
         }
     }
     Button(onBack) { Text("돌아가기") }
+}
+
+@Composable
+private fun MonitorSwitch(m: FallMonitor) {
+    val ctx = androidx.compose.ui.platform.LocalContext.current
+    Switch(m.running, { setMonitoring(ctx, it) }, enabled = !m.sensorMissing)
 }

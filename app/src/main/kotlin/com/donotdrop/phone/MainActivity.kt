@@ -1,8 +1,12 @@
 package com.donotdrop.phone
 
+import android.Manifest
+import android.content.pm.PackageManager
+import android.os.Build
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
@@ -12,35 +16,37 @@ import androidx.compose.ui.Modifier
 private enum class Screen { Main, Calibration, Settings, History }
 
 class MainActivity : ComponentActivity() {
-    private lateinit var monitor: FallMonitor
+    private val app get() = application as App
+
+    // 알림 권한은 거부돼도 서비스는 돈다(알림만 숨겨짐). 결과와 상관없이 감시를 시작한다.
+    private val notifPerm = registerForActivityResult(ActivityResultContracts.RequestPermission()) { startIfEnabled() }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        val settings = Settings(this)
-        val history = HistoryStore(this)
-        monitor = FallMonitor(this).also {
-            settings.applyTo(it)
-            it.onLanded = history::add
-        }
+        if (app.settings.onboarded) ensureRunning()
         setContent {
             MaterialTheme {
-                var onboarded by remember { mutableStateOf(settings.onboarded) }
+                var onboarded by remember { mutableStateOf(app.settings.onboarded) }
                 var screen by remember { mutableStateOf(Screen.Main) }
                 val toMain = { screen = Screen.Main }
                 Box(Modifier.safeDrawingPadding()) {
-                    if (!onboarded) OnboardingScreen { settings.onboarded = true; onboarded = true }
+                    if (!onboarded) OnboardingScreen { app.settings.onboarded = true; onboarded = true; ensureRunning() }
                     else when (screen) {
-                        Screen.Main -> MainScreen(monitor, { screen = Screen.Calibration }, { screen = Screen.Settings }, { screen = Screen.History })
-                        Screen.Calibration -> CalibrationScreen(monitor) { settings.saveThresholds(monitor); toMain() }
-                        Screen.Settings -> SettingsScreen(settings, monitor, toMain)
-                        Screen.History -> HistoryScreen(history, toMain)
+                        Screen.Main -> MainScreen(app.monitor, { screen = Screen.Calibration }, { screen = Screen.Settings }, { screen = Screen.History })
+                        Screen.Calibration -> CalibrationScreen(app.monitor) { app.settings.saveThresholds(app.monitor); toMain() }
+                        Screen.Settings -> SettingsScreen(app.settings, app.monitor, toMain)
+                        Screen.History -> HistoryScreen(app.history, toMain)
                     }
                 }
             }
         }
     }
 
-    override fun onPause() { super.onPause(); monitor.stop() } // MVP: 앱이 켜진 상태에서만 동작
+    private fun ensureRunning() {
+        if (Build.VERSION.SDK_INT >= 33 &&
+            checkSelfPermission(Manifest.permission.POST_NOTIFICATIONS) != PackageManager.PERMISSION_GRANTED
+        ) notifPerm.launch(Manifest.permission.POST_NOTIFICATIONS) else startIfEnabled()
+    }
 
-    override fun onDestroy() { super.onDestroy(); monitor.release() }
+    private fun startIfEnabled() { if (app.settings.monitorEnabled) setMonitoring(this, true) }
 }
