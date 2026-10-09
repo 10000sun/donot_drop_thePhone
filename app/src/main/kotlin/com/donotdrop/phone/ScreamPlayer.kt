@@ -5,13 +5,13 @@ import android.media.AudioAttributes
 import android.media.SoundPool
 import com.donotdrop.core.ScreamPlan
 
-/** 낙하 감지 즉시 재생하려고 미리 로드해 둔다. 음원은 임시 테스트 파일(res/raw/scream_test.wav). */
+/** 낙하 감지 즉시 재생하려고 미리 로드해 둔다. 음원은 res/raw/scream.wav. */
 class ScreamPlayer(context: Context) {
     private val pool = SoundPool.Builder()
         .setMaxStreams(1)
         .setAudioAttributes(AudioAttributes.Builder().setUsage(AudioAttributes.USAGE_MEDIA).build())
         .build()
-    private val soundId = pool.load(context, R.raw.scream_test, 1)
+    private val soundId = pool.load(context, R.raw.scream, 1)
     private var streamId = 0
     var volume = 1f
     val playing get() = streamId != 0
