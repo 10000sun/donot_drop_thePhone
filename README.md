@@ -10,3 +10,11 @@
 
 ## 안전
 테스트는 반드시 침대·쿠션 위에서 하세요. 폰을 일부러 던지지 마세요.
+
+## 빌드
+- `core`(판정 로직, 순수 Kotlin): `./gradlew :core:test`
+- `app`(Android): Android Studio에서 열어 실행. `local.properties`나 `ANDROID_HOME`이 있으면 `:app`이 자동 포함됩니다.
+
+## 알려진 사항
+- 비명 음원은 임시 테스트 톤(`app/src/main/res/raw/scream_test.wav`)입니다. 같은 이름의 파일로 교체하면 됩니다(직접 녹음했거나 이용 허락을 받은 음원만 사용).
+- 앱이 켜진 상태에서만 동작합니다(백그라운드 센서 제한). 낙하 기록 순위·던져 올리기 모드는 이후 단계입니다.
