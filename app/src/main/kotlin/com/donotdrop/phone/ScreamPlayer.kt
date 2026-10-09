@@ -14,6 +14,7 @@ class ScreamPlayer(context: Context) {
     private val soundId = pool.load(context, R.raw.scream_test, 1)
     private var streamId = 0
     var volume = 1f
+    val playing get() = streamId != 0
 
     fun start() {
         streamId = pool.play(soundId, volume, volume, 1, -1, 1f)
