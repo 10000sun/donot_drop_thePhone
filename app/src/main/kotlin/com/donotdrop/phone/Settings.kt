@@ -11,6 +11,7 @@ class Settings(context: Context) {
     private val p = context.getSharedPreferences("settings", Context.MODE_PRIVATE)
 
     var onboarded get() = p.getBoolean("onboarded", false); set(v) = p.edit().putBoolean("onboarded", v).apply()
+    var monitorEnabled get() = p.getBoolean("monitorEnabled", true); set(v) = p.edit().putBoolean("monitorEnabled", v).apply()
     var volume get() = p.getFloat("volume", 1f); set(v) = p.edit().putFloat("volume", v).apply()
     var catchLine get() = p.getString("catchLine", null) ?: "휴 깜짝 놀랐잖아요, 다음부턴 조심해주세요"
         set(v) = p.edit().putString("catchLine", v).apply()
