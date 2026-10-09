@@ -3,23 +3,38 @@ package com.donotdrop.phone
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+
+private enum class Screen { Main, Calibration, Settings, History }
 
 class MainActivity : ComponentActivity() {
     private lateinit var monitor: FallMonitor
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        monitor = FallMonitor(this)
+        val settings = Settings(this)
+        val history = HistoryStore(this)
+        monitor = FallMonitor(this).also {
+            settings.applyTo(it)
+            it.onLanded = history::add
+        }
         setContent {
             MaterialTheme {
-                var calibrating by remember { mutableStateOf(false) }
-                androidx.compose.foundation.layout.Box(Modifier.safeDrawingPadding()) {
-                    if (calibrating) CalibrationScreen(monitor) { calibrating = false }
-                    else MainScreen(monitor) { calibrating = true }
+                var onboarded by remember { mutableStateOf(settings.onboarded) }
+                var screen by remember { mutableStateOf(Screen.Main) }
+                val toMain = { screen = Screen.Main }
+                Box(Modifier.safeDrawingPadding()) {
+                    if (!onboarded) OnboardingScreen { settings.onboarded = true; onboarded = true }
+                    else when (screen) {
+                        Screen.Main -> MainScreen(monitor, { screen = Screen.Calibration }, { screen = Screen.Settings }, { screen = Screen.History })
+                        Screen.Calibration -> CalibrationScreen(monitor) { settings.saveThresholds(monitor); toMain() }
+                        Screen.Settings -> SettingsScreen(settings, monitor, toMain)
+                        Screen.History -> HistoryScreen(history, toMain)
+                    }
                 }
             }
         }
