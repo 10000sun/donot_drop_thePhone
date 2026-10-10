@@ -13,6 +13,24 @@ android {
         versionCode = 1
         versionName = "0.1.0"
     }
+    // 업로드 키는 저장소에 두지 않는다. 환경변수가 있을 때만 서명한다(없으면 서명 안 된 AAB가 나온다).
+    val keystorePath = System.getenv("UPLOAD_KEYSTORE_PATH")
+    signingConfigs {
+        if (keystorePath != null) create("upload") {
+            storeFile = file(keystorePath)
+            storePassword = System.getenv("UPLOAD_KEYSTORE_PASSWORD")
+            keyAlias = System.getenv("UPLOAD_KEY_ALIAS")
+            keyPassword = System.getenv("UPLOAD_KEY_PASSWORD")
+        }
+    }
+    buildTypes {
+        release {
+            isMinifyEnabled = true
+            isShrinkResources = true
+            proguardFiles(getDefaultProguardFile("proguard-android-optimize.txt"))
+            if (keystorePath != null) signingConfig = signingConfigs.getByName("upload")
+        }
+    }
     buildFeatures { compose = true }
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
