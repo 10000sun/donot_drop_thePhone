@@ -26,7 +26,6 @@ class FallMonitor(context: Context) : SensorEventListener {
     private val scream = ScreamPlayer(context)
     private var tts: TextToSpeech? = null
     private var pipeline = FallPipeline()
-    private var fallStartNs = 0L
 
     // 설정/보정 값. 바꾼 뒤 rebuild()를 부르면 반영된다.
     var freeFall by mutableFloatStateOf(2.5f)
@@ -82,10 +81,9 @@ class FallMonitor(context: Context) : SensorEventListener {
         if (graphIndex % 5 == 0) { magnitude = mag; graphTick++ } // 재구성 빈도 제한
 
         when (val ev = pipeline.onSample(e.timestamp, mag)) {
-            PipelineEvent.Started -> { fallStartNs = e.timestamp; scream.volume = volume; scream.start() }
-            PipelineEvent.Ended -> scream.stop()
+            PipelineEvent.Started -> { scream.volume = volume; scream.start() }
             is PipelineEvent.Landed -> handleLanded(ev)
-            null -> if (scream.playing) scream.update((e.timestamp - fallStartNs) / 1e9)
+            PipelineEvent.Ended, null -> Unit
         }
     }
 
