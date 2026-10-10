@@ -91,7 +91,7 @@ fun SettingsScreen(s: Settings, m: FallMonitor, onBack: () -> Unit) = Column(Mod
     Text("비명 볼륨")
     Slider(volume, { volume = it }, valueRange = 0f..1f)
     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
-        Text("화면이 꺼져도 계속 감시 (배터리 소모 큼)", Modifier.weight(1f))
+        Text("항상 감시 (배터리 소모 큼). 끄면 화면이 켜져 있거나 폰이 움직일 때만 감시합니다.", Modifier.weight(1f))
         Switch(keepAwake, { keepAwake = it })
     }
     Button({
