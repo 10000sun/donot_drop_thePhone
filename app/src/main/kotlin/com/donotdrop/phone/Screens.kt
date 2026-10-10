@@ -20,6 +20,7 @@ private val Outcome.label get() = when (this) {
 fun MainScreen(m: FallMonitor, onCalibrate: () -> Unit, onSettings: () -> Unit, onHistory: () -> Unit) = Column(Modifier.padding(16.dp), Arrangement.spacedBy(12.dp)) {
     Text("낙하 비명 폰", style = MaterialTheme.typography.headlineMedium)
     if (m.sensorMissing) Text("이 기기에는 가속도 센서가 없습니다.")
+    if (!m.ttsKorean) Text("한국어 음성이 설치되어 있지 않아 대사가 나오지 않습니다. 기기 설정의 '텍스트 음성 변환'에서 한국어 음성을 설치해 주세요.", color = MaterialTheme.colorScheme.error)
     Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
         Text("감시", Modifier.weight(1f))
         MonitorSwitch(m)
