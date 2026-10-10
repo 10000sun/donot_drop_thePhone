@@ -40,6 +40,8 @@ class FallMonitor(context: Context) : SensorEventListener {
 
     var running by mutableStateOf(false); private set
     var sensorMissing = sensor == null; private set
+    /** 한국어 음성이 없으면 대사가 나오지 않는다(화면에서 안내). */
+    var ttsKorean by mutableStateOf(true); private set
     var magnitude by mutableFloatStateOf(0f); private set
     var last by mutableStateOf<PipelineEvent.Landed?>(null); private set
     val graph = FloatArray(200)
@@ -47,7 +49,10 @@ class FallMonitor(context: Context) : SensorEventListener {
     var graphTick by mutableIntStateOf(0); private set
 
     init {
-        tts = TextToSpeech(context) { if (it == TextToSpeech.SUCCESS) tts?.language = Locale.KOREAN }
+        tts = TextToSpeech(context) { status ->
+            val r = if (status == TextToSpeech.SUCCESS) tts?.setLanguage(Locale.KOREAN) else null
+            ttsKorean = r != null && r != TextToSpeech.LANG_MISSING_DATA && r != TextToSpeech.LANG_NOT_SUPPORTED
+        }
     }
 
     fun rebuild() { pipeline = FallPipeline(freeFall, catchMax = catchMax, impactMin = impactMin) }
