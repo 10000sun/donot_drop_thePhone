@@ -4,7 +4,7 @@
 - [x] targetSdk/compileSdk 36 (2026-08-31 이후 신규 앱·업데이트 요건)
 - [x] 릴리스 AAB: R8 축소, 환경변수 서명 (`./gradlew :app:bundleRelease`), CI에서 검증
 - [x] allowBackup 끔, 런처 아이콘, 512 아이콘·피처 그래픽(`store/`)
-- [x] 웨이크락은 설정으로만(기본 끔) — Android vitals '과도한 부분 웨이크락' 지표 회피
+- [x] 웨이크락 최소화: 화면 켜짐/움직임 중에만 고속 감시, 정지 시 대기(MotionGate). '항상 감시'는 설정에서만(기본 끔) — Android vitals '과도한 부분 웨이크락' 지표 회피
 - [x] 한국어 TTS 음성이 없을 때 안내
 - [x] 광고 자리는 `AdSlot.kt` 한 곳. 안전 안내·보정·설정 화면에는 광고 없음
 

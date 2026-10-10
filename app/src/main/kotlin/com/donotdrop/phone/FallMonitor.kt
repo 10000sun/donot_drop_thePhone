@@ -59,6 +59,7 @@ class FallMonitor(context: Context) : SensorEventListener {
 
     fun start() {
         val s = sensor ?: return
+        if (running) return
         rebuild()
         sm.registerListener(this, s, SensorManager.SENSOR_DELAY_FASTEST)
         running = true

@@ -10,13 +10,12 @@ import android.content.Context
 import android.content.Intent
 import android.content.pm.ServiceInfo
 import android.os.IBinder
-import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 
-/** 포그라운드 서비스로 가속도계를 읽는다. 설정에서 켠 경우에만 부분 웨이크락으로 화면 꺼짐에도 유지한다. */
+/** 포그라운드 서비스. 언제 센서를 읽을지는 MotionGate가 정한다. */
 class FallService : Service() {
-    private var wakeLock: PowerManager.WakeLock? = null
+    private var gate: MotionGate? = null
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -33,18 +32,14 @@ class FallService : Service() {
             .setOngoing(true)
             .build()
         ServiceCompat.startForeground(this, 1, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
-        if ((application as App).settings.keepAwake) {
-            wakeLock = getSystemService(PowerManager::class.java)
-                .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "donotdrop:monitor").apply { acquire() }
-        }
-        (application as App).monitor.start()
+        val app = application as App
+        gate = MotionGate(this, app.monitor, app.settings.keepAwake).also { it.start() }
     }
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int) = START_STICKY
 
     override fun onDestroy() {
-        (application as App).monitor.stop()
-        wakeLock?.release()
+        gate?.stop()
         super.onDestroy()
     }
 
