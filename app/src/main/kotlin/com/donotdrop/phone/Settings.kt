@@ -12,6 +12,8 @@ class Settings(context: Context) {
 
     var onboarded get() = p.getBoolean("onboarded", false); set(v) = p.edit().putBoolean("onboarded", v).apply()
     var monitorEnabled get() = p.getBoolean("monitorEnabled", true); set(v) = p.edit().putBoolean("monitorEnabled", v).apply()
+    /** 화면이 꺼져도 감시하려면 웨이크락이 필요하다. Play 배터리 지표(과도한 부분 웨이크락) 때문에 기본은 끔. */
+    var keepAwake get() = p.getBoolean("keepAwake", false); set(v) = p.edit().putBoolean("keepAwake", v).apply()
     var volume get() = p.getFloat("volume", 1f); set(v) = p.edit().putFloat("volume", v).apply()
     var catchLine get() = p.getString("catchLine", null) ?: "휴 깜짝 놀랐잖아요, 다음부턴 조심해주세요"
         set(v) = p.edit().putString("catchLine", v).apply()
