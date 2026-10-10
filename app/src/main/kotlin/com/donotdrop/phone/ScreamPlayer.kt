@@ -3,7 +3,6 @@ package com.donotdrop.phone
 import android.content.Context
 import android.media.AudioAttributes
 import android.media.SoundPool
-import com.donotdrop.core.ScreamPlan
 
 /** 낙하 감지 즉시 재생하려고 미리 로드해 둔다. 음원은 res/raw/scream.wav. */
 class ScreamPlayer(context: Context) {
@@ -14,14 +13,9 @@ class ScreamPlayer(context: Context) {
     private val soundId = pool.load(context, R.raw.scream, 1)
     private var streamId = 0
     var volume = 1f
-    val playing get() = streamId != 0
 
     fun start() {
-        streamId = pool.play(soundId, volume, volume, 1, -1, 1f)
-    }
-
-    fun update(elapsedSec: Double) {
-        if (streamId != 0) pool.setRate(streamId, ScreamPlan.rate(elapsedSec))
+        streamId = pool.play(soundId, volume, volume, 1, 0, 1f) // 반복 없이 한 번만
     }
 
     fun stop() {
