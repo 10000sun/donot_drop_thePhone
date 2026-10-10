@@ -14,7 +14,7 @@ import android.os.PowerManager
 import androidx.core.app.NotificationCompat
 import androidx.core.app.ServiceCompat
 
-/** 화면이 꺼져도 가속도계를 계속 읽도록 포그라운드 서비스 + 부분 웨이크락을 쓴다. */
+/** 포그라운드 서비스로 가속도계를 읽는다. 설정에서 켠 경우에만 부분 웨이크락으로 화면 꺼짐에도 유지한다. */
 class FallService : Service() {
     private var wakeLock: PowerManager.WakeLock? = null
 
@@ -33,8 +33,10 @@ class FallService : Service() {
             .setOngoing(true)
             .build()
         ServiceCompat.startForeground(this, 1, n, ServiceInfo.FOREGROUND_SERVICE_TYPE_SPECIAL_USE)
-        wakeLock = getSystemService(PowerManager::class.java)
-            .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "donotdrop:monitor").apply { acquire() }
+        if ((application as App).settings.keepAwake) {
+            wakeLock = getSystemService(PowerManager::class.java)
+                .newWakeLock(PowerManager.PARTIAL_WAKE_LOCK, "donotdrop:monitor").apply { acquire() }
+        }
         (application as App).monitor.start()
     }
 

@@ -81,12 +81,21 @@ fun SettingsScreen(s: Settings, m: FallMonitor, onBack: () -> Unit) = Column(Mod
     var impactLine by remember { mutableStateOf(s.impactLine) }
     var unsureLine by remember { mutableStateOf(s.unsureLine) }
     var volume by remember { mutableStateOf(s.volume) }
+    var keepAwake by remember { mutableStateOf(s.keepAwake) }
+    val ctx = androidx.compose.ui.platform.LocalContext.current
     val bounds = remember { mutableStateListOf(*s.bounds.map { it.toFloat() }.toTypedArray()) }
     OutlinedTextField(catchLine, { catchLine = it }, label = { Text("잡았을 때 대사") }, modifier = Modifier.fillMaxWidth())
     OutlinedTextField(impactLine, { impactLine = it }, label = { Text("충돌 대사") }, modifier = Modifier.fillMaxWidth())
     OutlinedTextField(unsureLine, { unsureLine = it }, label = { Text("애매할 때 대사") }, modifier = Modifier.fillMaxWidth())
     Text("비명 볼륨")
     Slider(volume, { volume = it }, valueRange = 0f..1f)
+    Row(verticalAlignment = androidx.compose.ui.Alignment.CenterVertically) {
+        Text("화면이 꺼져도 계속 감시 (배터리 소모 큼)", Modifier.weight(1f))
+        Switch(keepAwake, { keepAwake = it })
+    }
+    Button({
+        ctx.startActivity(android.content.Intent(android.provider.Settings.ACTION_IGNORE_BATTERY_OPTIMIZATION_SETTINGS))
+    }) { Text("배터리 최적화 설정 열기") }
     Text("반응 구간 경계(초)")
     bounds.forEachIndexed { i, v ->
         Text("%.2f초".format(v))
@@ -96,6 +105,10 @@ fun SettingsScreen(s: Settings, m: FallMonitor, onBack: () -> Unit) = Column(Mod
         s.catchLine = catchLine; s.impactLine = impactLine; s.unsureLine = unsureLine; s.volume = volume
         s.bounds = bounds.map { it.toDouble() }.sorted() // 경계는 항상 오름차순
         s.applyTo(m)
+        if (keepAwake != s.keepAwake) {
+            s.keepAwake = keepAwake
+            if (m.running) { setMonitoring(ctx, false); setMonitoring(ctx, true) } // 웨이크락 설정은 서비스를 다시 시작해야 반영
+        }
         onBack()
     }) { Text("저장") }
 }
