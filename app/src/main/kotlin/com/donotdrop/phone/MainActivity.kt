@@ -8,6 +8,7 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.safeDrawingPadding
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.*
@@ -29,14 +30,17 @@ class MainActivity : ComponentActivity() {
                 var onboarded by remember { mutableStateOf(app.settings.onboarded) }
                 var screen by remember { mutableStateOf(Screen.Main) }
                 val toMain = { screen = Screen.Main }
-                Box(Modifier.safeDrawingPadding()) {
-                    if (!onboarded) OnboardingScreen { app.settings.onboarded = true; onboarded = true; ensureRunning() }
-                    else when (screen) {
-                        Screen.Main -> MainScreen(app.monitor, { screen = Screen.Calibration }, { screen = Screen.Settings }, { screen = Screen.History })
-                        Screen.Calibration -> CalibrationScreen(app.monitor) { app.settings.saveThresholds(app.monitor); toMain() }
-                        Screen.Settings -> SettingsScreen(app.settings, app.monitor, toMain)
-                        Screen.History -> HistoryScreen(app.history, toMain)
+                Column(Modifier.safeDrawingPadding()) {
+                    Box(Modifier.weight(1f)) {
+                        if (!onboarded) OnboardingScreen { app.settings.onboarded = true; onboarded = true; ensureRunning() }
+                        else when (screen) {
+                            Screen.Main -> MainScreen(app.monitor, { screen = Screen.Calibration }, { screen = Screen.Settings }, { screen = Screen.History })
+                            Screen.Calibration -> CalibrationScreen(app.monitor) { app.settings.saveThresholds(app.monitor); toMain() }
+                            Screen.Settings -> SettingsScreen(app.settings, app.monitor, toMain)
+                            Screen.History -> HistoryScreen(app.history, toMain)
+                        }
                     }
+                    if (onboarded && (screen == Screen.Main || screen == Screen.History)) AdSlot()
                 }
             }
         }
