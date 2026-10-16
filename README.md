@@ -26,7 +26,7 @@
 
 ## 빌드
 - `core`(판정 로직, 순수 Kotlin): `./gradlew :core:test`
-- `app`(Android): Android Studio에서 열어 실행. `local.properties`나 `ANDROID_HOME`이 있으면 `:app`이 자동 포함됩니다.
+- `app`(Android): Android Studio에서 열어 Gradle Sync 후 실행(`:app`은 항상 포함). Android SDK가 없는 환경에서 core만 테스트할 때는 `CORE_ONLY=1 ./gradlew :core:test`.
 
 ## 알려진 사항
 - 비명 음원은 `app/src/main/res/raw/scream.wav`(0.2초)입니다. 낙하가 감지되면 반복 없이 한 번만 재생합니다.

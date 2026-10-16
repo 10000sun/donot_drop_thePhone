@@ -12,5 +12,6 @@ dependencyResolutionManagement {
 }
 rootProject.name = "donot_drop_thePhone"
 include(":core")
-// shortcut: app 모듈은 Android SDK가 있을 때만 포함(SDK 없는 CI/샌드박스에서 core 테스트용), SDK 있는 환경에선 항상 포함됨
-if (System.getenv("ANDROID_HOME") != null || file("local.properties").exists()) include(":app")
+// app 모듈은 항상 포함한다(Android Studio는 local.properties/ANDROID_HOME이 동기화 전에 없을 수 있다).
+// Android SDK가 없는 환경에서 core 테스트만 돌릴 때만 CORE_ONLY=1로 제외한다.
+if (System.getenv("CORE_ONLY") == null) include(":app")
