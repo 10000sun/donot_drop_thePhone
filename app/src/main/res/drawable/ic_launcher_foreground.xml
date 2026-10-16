@@ -1,0 +1,12 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp" android:height="108dp" android:viewportWidth="108" android:viewportHeight="108">
+    <!-- 폰 몸체 -->
+    <path android:fillColor="#FFFFFF" android:pathData="M38,24h32a4,4 0 0 1 4,4v52a4,4 0 0 1 -4,4H38a4,4 0 0 1 -4,-4V28a4,4 0 0 1 4,-4z" />
+    <!-- 화면 -->
+    <path android:fillColor="#2B2B2B" android:pathData="M39,31h30v42H39z" />
+    <!-- 놀란 눈 -->
+    <path android:fillColor="#FFFFFF" android:pathData="M44,43a3,3 0 1 0 6,0a3,3 0 1 0 -6,0z" />
+    <path android:fillColor="#FFFFFF" android:pathData="M58,43a3,3 0 1 0 6,0a3,3 0 1 0 -6,0z" />
+    <!-- 비명 지르는 입 -->
+    <path android:fillColor="#FF5A4E" android:pathData="M48,56a6,8 0 1 0 12,0a6,8 0 1 0 -12,0z" />
+</vector>
